@@ -229,7 +229,7 @@ function DragSortTH({ children, index, colId, sort, onSort, onDragStart, onDragO
       onDragLeave={()=>setOver(false)}
       onDrop={()=>{ setOver(false); onDrop(index); }}
       onClick={()=>onSort(colId)}
-      style={{ padding:"8px 12px", textAlign:right?"right":"left", color:isSorted?C.blue:over?C.text:C.muted, fontWeight:500, fontSize:10, letterSpacing:"0.07em", textTransform:"uppercase", borderBottom:`1px solid ${C.border}`, whiteSpace:"nowrap", cursor:"pointer", userSelect:"none", background:over?"rgba(77,168,255,0.06)":"transparent", transition:"all 0.15s" }}>
+      style={{ padding:"8px 12px", textAlign:right?"center":"left", color:isSorted?C.blue:over?C.text:C.muted, fontWeight:500, fontSize:10, letterSpacing:"0.07em", textTransform:"uppercase", borderBottom:`1px solid ${C.border}`, whiteSpace:"nowrap", cursor:"pointer", userSelect:"none", background:over?"rgba(77,168,255,0.06)":"transparent", transition:"all 0.15s" }}>
       {children}{isSorted?(sort.dir==="asc"?" ↑":" ↓"):""}
     </th>
   );
@@ -237,7 +237,7 @@ function DragSortTH({ children, index, colId, sort, onSort, onDragStart, onDragO
 
 function TD({ children, right, mono, color, bold }) {
   return (
-    <td style={{ padding:"9px 12px", textAlign:right?"right":"left", color:color||C.text, fontFamily:mono?"'JetBrains Mono',monospace":"inherit", fontSize:12, borderBottom:`1px solid rgba(255,255,255,0.03)`, fontWeight:bold?500:400, whiteSpace:"nowrap" }}>
+    <td style={{ padding:"9px 12px", textAlign:right?"center":"left", color:color||C.text, fontFamily:mono?"'JetBrains Mono',monospace":"inherit", fontSize:12, borderBottom:`1px solid rgba(255,255,255,0.03)`, fontWeight:bold?500:400, whiteSpace:"nowrap" }}>
       {children}
     </td>
   );
