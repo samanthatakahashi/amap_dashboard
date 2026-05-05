@@ -35,12 +35,21 @@ const DEMO = {
     { link:"", nome:"IMG_oferta_v1",  invest:110, impressoes:14000, cliques:360, views:288, checkouts:60,  compras:14, v3s:0,     v50:0,     receita:6860,  ctr:2.6, hook:0,    body:0,    cpv:7.86 },
     { link:"", nome:"VSL_v4_stories", invest:140, impressoes:18000, cliques:460, views:368, checkouts:80,  compras:18, v3s:14400, v50:8100,  receita:8820,  ctr:2.6, hook:80.0, body:56.3, cpv:7.78 },
   ],
-  organico: [
-    { utm:"instagram_feed",   compras:38, receita:37886 },
+  utms: [
+    { utm:"instagram_feed",    compras:38, receita:37886 },
     { utm:"instagram_stories", compras:24, receita:23928 },
-    { utm:"email_lista",      compras:31, receita:30907 },
-    { utm:"whatsapp_grupo",   compras:19, receita:18943 },
-    { utm:"youtube_desc",     compras:12, receita:11964 },
+    { utm:"email_lista",       compras:31, receita:30907 },
+    { utm:"whatsapp_grupo",    compras:19, receita:18943 },
+    { utm:"youtube_desc",      compras:12, receita:11964 },
+  ],
+  orgDiario: [
+    { data:"28/04/2025", compras:12, receita:11964 },
+    { data:"29/04/2025", compras:15, receita:14955 },
+    { data:"30/04/2025", compras:11, receita:10967 },
+    { data:"01/05/2025", compras:18, receita:17946 },
+    { data:"02/05/2025", compras:14, receita:13958 },
+    { data:"03/05/2025", compras:21, receita:20937 },
+    { data:"04/05/2025", compras:33, receita:32901 },
   ],
 };
 
@@ -229,7 +238,7 @@ function DragSortTH({ children, index, colId, sort, onSort, onDragStart, onDragO
       onDragLeave={()=>setOver(false)}
       onDrop={()=>{ setOver(false); onDrop(index); }}
       onClick={()=>onSort(colId)}
-      style={{ padding:"8px 12px", textAlign:right?"center":"left", color:isSorted?C.blue:over?C.text:C.muted, fontWeight:500, fontSize:10, letterSpacing:"0.07em", textTransform:"uppercase", borderBottom:`1px solid ${C.border}`, whiteSpace:"nowrap", cursor:"pointer", userSelect:"none", background:over?"rgba(77,168,255,0.06)":"transparent", transition:"all 0.15s" }}>
+      style={{ padding:"8px 12px", textAlign:right?"right":"left", color:isSorted?C.blue:over?C.text:C.muted, fontWeight:500, fontSize:10, letterSpacing:"0.07em", textTransform:"uppercase", borderBottom:`1px solid ${C.border}`, whiteSpace:"nowrap", cursor:"pointer", userSelect:"none", background:over?"rgba(77,168,255,0.06)":"transparent", transition:"all 0.15s" }}>
       {children}{isSorted?(sort.dir==="asc"?" ↑":" ↓"):""}
     </th>
   );
@@ -237,7 +246,7 @@ function DragSortTH({ children, index, colId, sort, onSort, onDragStart, onDragO
 
 function TD({ children, right, mono, color, bold }) {
   return (
-    <td style={{ padding:"9px 12px", textAlign:right?"center":"left", color:color||C.text, fontFamily:mono?"'JetBrains Mono',monospace":"inherit", fontSize:12, borderBottom:`1px solid rgba(255,255,255,0.03)`, fontWeight:bold?500:400, whiteSpace:"nowrap" }}>
+    <td style={{ padding:"9px 12px", textAlign:right?"right":"left", color:color||C.text, fontFamily:mono?"'JetBrains Mono',monospace":"inherit", fontSize:12, borderBottom:`1px solid rgba(255,255,255,0.03)`, fontWeight:bold?500:400, whiteSpace:"nowrap" }}>
       {children}
     </td>
   );
@@ -296,14 +305,14 @@ function DateFilter({ diarios, filterMode, setFilterMode, selectedDates, setSele
 }
 
 // ─── VISÃO GERAL TAB (combinado pago + orgânico) ──────────────────────────────
-function VisaoGeralTab({ diarios, organico, config }) {
+function VisaoGeralTab({ diarios, utms, orgDiario, config }) {
   const totalPago = useMemo(()=>diarios.reduce((acc,d)=>({
     invest: acc.invest+d.invest, compras: acc.compras+d.compras, receita: acc.receita+d.receita,
   }),{invest:0,compras:0,receita:0}),[diarios]);
 
-  const totalOrg = useMemo(()=>organico.reduce((acc,u)=>({
+  const totalOrg = useMemo(()=>utms.reduce((acc,u)=>({
     compras: acc.compras+u.compras, receita: acc.receita+u.receita,
-  }),{compras:0,receita:0}),[organico]);
+  }),{compras:0,receita:0}),[utms]);
 
   const totalVendas  = totalPago.compras + totalOrg.compras;
   const totalReceita = totalPago.receita + totalOrg.receita;
@@ -514,15 +523,16 @@ const ORG_COLS=[
   {id:"ticket",  label:"Ticket Médio",     right:true,  val:(u)=>safe(u.receita,u.compras)},
 ];
 
-function OrganicoTab({ organico }) {
-  const sorted = useMemo(()=>[...organico].sort((a,b)=>b.receita-a.receita),[organico]);
-  const totalCompras = useMemo(()=>organico.reduce((s,u)=>s+u.compras,0),[organico]);
-  const totalReceita = useMemo(()=>organico.reduce((s,u)=>s+u.receita,0),[organico]);
+function OrganicoTab({ utms, orgDiario }) {
+  const sorted = useMemo(()=>[...utms].sort((a,b)=>b.receita-a.receita),[utms]);
+  const totalCompras = useMemo(()=>utms.reduce((s,u)=>s+u.compras,0),[utms]);
+  const totalReceita = useMemo(()=>utms.reduce((s,u)=>s+u.receita,0),[utms]);
   const {cols,sort,onDragStart,onDragOver,onDrop,onDragEnd,onSort}=useDraggableCols(ORG_COLS);
   const tableRows=useMemo(()=>sortRows(sorted,sort,ORG_COLS),[sorted,sort]);
 
   // Bar chart data
-  const barData=sorted.map(u=>({ name:u.utm, receita:u.receita, compras:u.compras }));
+  const sortedUtms=sorted;
+  const barData=sortedUtms.map(u=>({ name:u.utm, receita:u.receita, compras:u.compras }));
 
   return (
     <div style={{display:"flex",flexDirection:"column",gap:20}}>
@@ -532,6 +542,22 @@ function OrganicoTab({ organico }) {
         <KPI label="Receita Orgânica Total"  value={f.brl(totalReceita)} color={C.green}/>
         <KPI label="Ticket Médio"            value={f.brl(safe(totalReceita,totalCompras))} color={C.purple}/>
       </div>
+
+      {/* Daily organic chart */}
+      {orgDiario.length>0 && (
+        <Card title="Vendas Orgânicas por Dia">
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={orgDiario} margin={{top:4,right:4,left:0,bottom:0}}>
+              <defs><linearGradient id="gOrg" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor={C.amber} stopOpacity={0.3}/><stop offset="95%" stopColor={C.amber} stopOpacity={0}/></linearGradient></defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)"/>
+              <XAxis dataKey="data" tick={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,fill:C.muted}} axisLine={false} tickLine={false}/>
+              <YAxis tick={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,fill:C.muted}} axisLine={false} tickLine={false} width={40} tickFormatter={v=>f.num(v)}/>
+              <Tooltip content={<ChartTip fmt="num"/>}/>
+              <Area type="monotone" dataKey="compras" name="Vendas" stroke={C.amber} fill="url(#gOrg)" strokeWidth={2} dot={false}/>
+            </AreaChart>
+          </ResponsiveContainer>
+        </Card>
+      )}
 
       {/* Vertical bar chart */}
       <Card title="Receita por UTM">
@@ -574,7 +600,7 @@ function OrganicoTab({ organico }) {
             </tr></thead>
             <tbody>
               {tableRows.map((u,ri)=>{
-                const color=PALETTE[sorted.findIndex(s=>s.utm===u.utm)%PALETTE.length];
+                const color=PALETTE[sortedUtms.findIndex(s=>s.utm===u.utm)%PALETTE.length];
                 return (
                   <tr key={ri}>
                     {cols.map(col=>{
@@ -806,20 +832,30 @@ export default function App() {
     return data;
   },[]);
 
+  const fetchCSVRaw=useCallback(async(sheet)=>{
+    const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheet)}`;
+    const res=await fetch(url);
+    if(!res.ok) return [];
+    const text=await res.text();
+    const {data}=Papa.parse(text,{header:false,skipEmptyLines:true});
+    return data;
+  },[]);
+
   useEffect(()=>{
     (async()=>{
       try{
-        const [rawD,rawC,rawP,rawCfg,rawCH,rawOrg]=await Promise.all([
+        const [rawD,rawC,rawP,rawCfg,rawCH,rawUtms,rawOrgD]=await Promise.all([
           fetchCSV("dados_diarios"),
           fetchCSV("criativos"),
           fetchCSV("paginas"),
-          fetchCSV("config").catch(()=>[]),
+          fetchCSVRaw("config").catch(()=>[]),
           fetchCSV("criativos_hoje").catch(()=>[]),
+          fetchCSV("utms").catch(()=>[]),
           fetchCSV("organico").catch(()=>[]),
         ]);
 
         const cfg={};
-        rawCfg.filter(r=>r["Configuração"]).forEach(r=>{ cfg[String(r["Configuração"]).trim()]=String(r["Valor"]||"").trim(); });
+        rawCfg.filter(r=>r[0]).forEach(r=>{ cfg[String(r[0]).trim()]=String(r[1]||"").trim(); });
 
         const g = (row,...keys) => { for(const k of keys){ if(row[k]!==undefined && row[k]!=="") return row[k]; } return ""; };
 
@@ -863,13 +899,19 @@ export default function App() {
           receita:   parseNum(g(r,"Receita\n(R$)","Receita (R$)")),
         }));
 
-        const organico=rawOrg.filter(r=>g(r,"UTM")).map(r=>({
+        const utms=rawUtms.filter(r=>g(r,"UTM")).map(r=>({
           utm:     String(g(r,"UTM")||"").trim(),
           compras: parseNum(g(r,"Compras")),
           receita: parseNum(g(r,"Receita (R$)","Receita\n(R$)")),
         })).filter(r=>r.utm);
 
-        setLiveData({config:cfg,diarios,criativos,criativosHoje,paginas,organico});
+        const orgDiario=rawOrgD.map(r=>({
+          data:    String(g(r,"Data (DD-MM-YYYY)","Data\n(DD-MM-YYYY)")||"").trim(),
+          compras: parseNum(g(r,"Compras")),
+          receita: parseNum(g(r,"Receita (R$)","Receita\n(R$)")),
+        })).filter(r=>r.data&&(r.compras>0||r.receita>0));
+
+        setLiveData({config:cfg,diarios,criativos,criativosHoje,paginas,utms,orgDiario});
       }catch(e){
         setError(e.message||"Erro ao carregar dados.");
       }
@@ -914,9 +956,9 @@ export default function App() {
         ))}
       </div>
       <div style={{maxWidth:1340,margin:"0 auto",padding:"26px 32px 64px"}}>
-        {tab==="geral"     && <VisaoGeralTab diarios={current.diarios} organico={current.organico||[]} config={current.config}/>}
+        {tab==="geral"     && <VisaoGeralTab diarios={current.diarios} utms={current.utms||[]} orgDiario={current.orgDiario||[]} config={current.config}/>}
         {tab==="trafego"   && <TrafegoTab    diarios={current.diarios} config={current.config}/>}
-        {tab==="organico"  && <OrganicoTab   organico={current.organico||[]}/>}
+        {tab==="organico"  && <OrganicoTab   utms={current.utms||[]} orgDiario={current.orgDiario||[]}/>}
         {tab==="criativos" && <CreativosTab  criativos={current.criativos} criativosHoje={current.criativosHoje||[]}/>}
         {tab==="paginas"   && <PaginasTab    paginas={current.paginas}/>}
       </div>
