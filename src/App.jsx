@@ -872,19 +872,13 @@ export default function App() {
 
         // Parse today's temp data and merge — temp replaces any matching date in diarios
         const diariosTemp=rawDTemp.map(r=>({
-          data:      String(g(r,"Data
-(DD-MM-YYYY)","Data (DD-MM-YYYY)")).trim(),
-          invest:    parseNum(g(r,"Investimento
-(R$)","Investimento (R$)")),
-          cliques:   parseNum(g(r,"Cliques
-no Link","Cliques no Link")),
-          views:     parseNum(g(r,"Views de
-Página","Views de Página")),
-          checkouts: parseNum(g(r,"Checkouts
-Iniciados","Checkouts Iniciados")),
+          data:      String(g(r,"Data\n(DD-MM-YYYY)","Data (DD-MM-YYYY)")).trim(),
+          invest:    parseNum(g(r,"Investimento\n(R$)","Investimento (R$)")),
+          cliques:   parseNum(g(r,"Cliques\nno Link","Cliques no Link")),
+          views:     parseNum(g(r,"Views de\nPágina","Views de Página")),
+          checkouts: parseNum(g(r,"Checkouts\nIniciados","Checkouts Iniciados")),
           compras:   parseNum(g(r,"Compras")),
-          receita:   parseNum(g(r,"Receita
-(R$)","Receita (R$)")),
+          receita:   parseNum(g(r,"Receita\n(R$)","Receita (R$)")),
         })).filter(r=>r.data&&(r.invest>0||r.cliques>0||r.compras>0));
 
         // Merge: historical days from dados_diarios + today from dados_diarios_temp
